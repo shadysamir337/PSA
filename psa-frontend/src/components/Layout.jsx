@@ -1,17 +1,61 @@
+import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 
 export default function Layout() {
     const { user, signOut } = useAuth()
     const nav = useNavigate()
+    const [sidebarOpen, setSidebarOpen] = useState(false)
 
     const handleLogout = () => {
         signOut()
         nav('/signin', { replace: true })
     }
 
+    const closeSidebar = () => setSidebarOpen(false)
+
     return (
-        <div className="app-shell">
+        <div className={`app-shell${sidebarOpen ? ' sidebar-open' : ''}`}>
+            {/* Mobile-only top bar with hamburger */}
+            <header className="mobile-topbar">
+                <button
+                    type="button"
+                    className="hamburger-btn"
+                    aria-label="Open navigation"
+                    onClick={() => setSidebarOpen((v) => !v)}
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        width="20"
+                        height="20"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                    >
+                        {sidebarOpen ? (
+                            <>
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </>
+                        ) : (
+                            <>
+                                <line x1="3" y1="6" x2="21" y2="6" />
+                                <line x1="3" y1="12" x2="21" y2="12" />
+                                <line x1="3" y1="18" x2="21" y2="18" />
+                            </>
+                        )}
+                    </svg>
+                </button>
+                <img src="/logo.png" alt="ATS" className="mobile-topbar-logo" />
+                <div className="mobile-topbar-brand">Employee Portal</div>
+            </header>
+
+            {/* Backdrop shown only when drawer is open (mobile) */}
+            <div className="sidebar-backdrop" onClick={closeSidebar} aria-hidden="true" />
+
             <aside className="sidebar">
                 <div className="brand">
                     <img src="/logo.png" alt="ATS — About The Solution" className="brand-logo-img" />
@@ -20,7 +64,7 @@ export default function Layout() {
                         <div className="brand-sub">Projects · Tasks · Time</div>
                     </div>
                 </div>
-                <nav className="nav">
+                <nav className="nav" onClick={closeSidebar}>
                     <NavLink to="/dashboard" className="nav-link">📊 Dashboard</NavLink>
                     <NavLink to="/projects" className="nav-link">📁 Projects</NavLink>
                     <NavLink to="/tasks" className="nav-link">✅ My Tasks</NavLink>
@@ -37,7 +81,7 @@ export default function Layout() {
                     <button
                         type="button"
                         className="user-chip"
-                        onClick={() => nav('/profile')}
+                        onClick={() => { closeSidebar(); nav('/profile') }}
                         title="Open profile"
                     >
                         <div className="avatar">{(user?.name?.[0] || 'U').toUpperCase()}</div>
