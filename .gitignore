@@ -8,3 +8,5 @@ dist-ssr
 *.log
 psa-frontend/dist/
 .firecrawl/
+.git_disabled/
+psa-frontend/.git_disabled/
